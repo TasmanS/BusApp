@@ -46,18 +46,20 @@ class Application(tk.Frame):
     
 
     def createWidgets(self):
-        self.hi_there = tk.Button(self)
-        self.hi_there["text"] = "\n 48 Bus Schedule\n \n (click to update)\n"
-        self.hi_there["command"] = self.updateRoute
-        
+        m1 = tk.PanedWindow()
+        m1.pack(self)
 
-        self.hi_there.pack(side="top")
+        left = tk.Label(m1, text="left pane")
+        m1.add(left)
 
-        self.QUIT = tk.Button(self, text="QUIT", fg="red",
-                                            command=root.destroy)
-                   
-        
-        self.QUIT.pack(side="bottom")
+        m2 = tk.PanedWindow(m1, orient=VERTICAL)
+        m1.add(m2)
+
+        top = tk.Label(m2, text="top pane")
+        m2.add(top)
+
+        bottom = tk.Label(m2, text="bottom pane")
+        m2.add(bottom)
 
     def updateRoute(self):
             fortyEight=busSchedule()
