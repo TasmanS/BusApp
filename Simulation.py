@@ -1,12 +1,9 @@
 # Problem Set 6: Simulating robots
-# Name:
-# Collaborators:
-# Time:
 
 import math
 import random
 
-import ps6_visualize
+##import ps6_visualize
 import pylab
 
 # === Provided classes
@@ -43,8 +40,8 @@ class Position(object):
         delta_y = speed * math.cos(math.radians(angle))
         delta_x = speed * math.sin(math.radians(angle))
         # Add that to the existing position
-        new_x = old_x + delta_x
-        new_y = old_y + delta_y
+        new_x = round((old_x + delta_x),2)
+        new_y = round((old_y + delta_y),2)
         return Position(new_x, new_y)
 
 # === Problems 1
@@ -66,7 +63,14 @@ class RectangularRoom(object):
         width: an integer > 0
         height: an integer > 0
         """
-        raise NotImplementedError
+        self.robots=[]
+        self.width=width
+        self.height=height
+        self.floordictionary={}
+        for x in range(width):
+            for y in range(height):
+                self.floordictionary[x,y]=1
+        print(self.floordictionary)
     
     def cleanTileAtPosition(self, pos):
         """
@@ -76,7 +80,7 @@ class RectangularRoom(object):
 
         pos: a Position
         """
-        raise NotImplementedError
+        self.floordictionary[int(pos.x),int(pos.y)]=0      
 
     def isTileCleaned(self, m, n):
         """
@@ -88,7 +92,7 @@ class RectangularRoom(object):
         n: an integer
         returns: True if (m, n) is cleaned, False otherwise
         """
-        raise NotImplementedError
+        return self.floordictionary[m,n]==0
     
     def getNumTiles(self):
         """
@@ -96,7 +100,7 @@ class RectangularRoom(object):
 
         returns: an integer
         """
-        raise NotImplementedError
+        return len(self.floordictionary)
 
     def getNumCleanedTiles(self):
         """
@@ -104,16 +108,21 @@ class RectangularRoom(object):
 
         returns: an integer
         """
-        raise NotImplementedError
-
+        cleaned=[]
+        for k in self.floordictionary.keys():
+            if self.floordictionary[k]==0:
+                cleaned.append(k)
+        return len(cleaned)
+    
     def getRandomPosition(self):
         """
         Return a random position inside the room.
 
         returns: a Position object.
         """
-        raise NotImplementedError
-
+        return Position(float((random.randrange(self.width)+ random.randrange(1,11)*.1)),
+                         float((random.randrange(self.height)+ random.randrange(1,11)*.1)))
+        
     def isPositionInRoom(self, pos):
         """
         Return True if pos is inside the room.
@@ -121,8 +130,12 @@ class RectangularRoom(object):
         pos: a Position object.
         returns: True if pos is in the room, False otherwise.
         """
-        raise NotImplementedError
-
+        if pos.x>=self.width or pos.x<=0:
+            return False
+        elif pos.y>=self.height or pos.y<=0:
+            return False
+        else:
+            return True
 
 class Robot(object):
     """
@@ -143,15 +156,20 @@ class Robot(object):
         room:  a RectangularRoom object.
         speed: a float (speed > 0)
         """
-        raise NotImplementedError
-
+        room.robots.append(self)
+        self.room=room
+        self.position=room.getRandomPosition()
+        self.speed=speed
+        self.direction=random.randrange(1,361,1)
+        room.cleanTileAtPosition(self.position)
+        
     def getRobotPosition(self):
         """
         Return the position of the robot.
 
         returns: a Position object giving the robot's position.
         """
-        raise NotImplementedError
+        return self.position
     
     def getRobotDirection(self):
         """
@@ -160,7 +178,7 @@ class Robot(object):
         returns: an integer d giving the direction of the robot as an angle in
         degrees, 0 <= d < 360.
         """
-        raise NotImplementedError
+        return self.direction
 
     def setRobotPosition(self, position):
         """
@@ -168,7 +186,10 @@ class Robot(object):
 
         position: a Position object.
         """
-        raise NotImplementedError
+        try:
+            self.position=position
+        except:
+            print("not a valid position")
 
     def setRobotDirection(self, direction):
         """
@@ -176,7 +197,7 @@ class Robot(object):
 
         direction: integer representing an angle in degrees
         """
-        raise NotImplementedError
+        self.direction=direction
 
     def updatePositionAndClean(self):
         """
@@ -185,10 +206,21 @@ class Robot(object):
         Move the robot to a new position and mark the tile it is on as having
         been cleaned.
         """
-        raise NotImplementedError
+        testPos=self.position.getNewPosition(self.direction, self.speed)
+        if not self.room.isPositionInRoom(testPos):
+            self.setRobotDirection(random.randrange(1,361,1))
+            print("out of range")
+            self.updatePositionAndClean()
+            
+        else:
+            self.position=self.position.getNewPosition(self.direction, self.speed)
+            self.room.cleanTileAtPosition(self.position)
+        
+# === Problem 2 START HERE
+# Fixed issues in problem 1, now uses float->int conversion to identify panel to be cleaned in room
+# Idea = write a recursive element so it tests validitiy on each
+# Validiated to work up to problem 3. method updatepostion copied to class, remove out of range if needed
 
-
-# === Problem 2
 class StandardRobot(Robot):
     """
     A StandardRobot is a Robot with the standard movement strategy.
@@ -203,9 +235,24 @@ class StandardRobot(Robot):
         Move the robot to a new position and mark the tile it is on as having
         been cleaned.
         """
-        raise NotImplementedError
+        testPos=self.position.getNewPosition(self.direction, self.speed)
+        if not self.room.isPositionInRoom(testPos):
+            self.setRobotDirection(random.randrange(1,361,1))
+            print("out of range")
+            self.updatePositionAndClean()
+            
+        else:
+            self.position=self.position.getNewPosition(self.direction, self.speed)
+            self.room.cleanTileAtPosition(self.position)
+                   
 
 # === Problem 3
+# How to approach? First get multiple robots going all from simulation function - check
+# figure out how to generate and record data - coverage - check
+# iterate over a number of simulations and figure out how to mean data - not check
+## Fuck yeah, running at range 50-110 steps to fully clean
+## it was adding new tiles if on wall. Since on the line counts as a diff tile, had
+## to set validation test tighter
 
 def runSimulation(num_robots, speed, width, height, min_coverage, num_trials,
                   robot_type):
@@ -225,45 +272,67 @@ def runSimulation(num_robots, speed, width, height, min_coverage, num_trials,
     robot_type: class of robot to be instantiated (e.g. Robot or
                 RandomWalkRobot)
     """
-    raise NotImplementedError
+    for trials in range(1,num_trials+1):
+        room=RectangularRoom(width,height)
+        counter=0
+        for n in range(1,num_robots+1):
+            n=robot_type(room,speed)
+        while (room.getNumCleanedTiles()/len(room.floordictionary) < min_coverage):
+            for r in room.robots:
+                r.updatePositionAndClean()
+            counter+=1
+            
+        print(counter)
+        print(len(room.floordictionary))
+        print(room.getNumCleanedTiles())
+        print(room.floordictionary)
+        
 
 
-# === Problem 4
-#
-# 1) How long does it take to clean 80% of a 20×20 room with each of 1-10 robots?
-#
-# 2) How long does it take two robots to clean 80% of rooms with dimensions 
-#	 20×20, 25×16, 40×10, 50×8, 80×5, and 100×4?
+    
 
-def showPlot1():
-    """
-    Produces a plot showing dependence of cleaning time on number of robots.
-    """ 
-    raise NotImplementedError
+### === Problem 4
+###
+### 1) How long does it take to clean 80% of a 20×20 room with each of 1-10 robots?
+###
+### 2) How long does it take two robots to clean 80% of rooms with dimensions 
+###	 20×20, 25×16, 40×10, 50×8, 80×5, and 100×4?
+##
+##def showPlot1():
+##    """
+##    Produces a plot showing dependence of cleaning time on number of robots.
+##    """ 
+##    raise NotImplementedError
+##
+##def showPlot2():
+##    """
+##    Produces a plot showing dependence of cleaning time on room shape.
+##    """
+##    raise NotImplementedError
+##
+### === Problem 5
+##
+##class RandomWalkRobot(Robot):
+##    """
+##    A RandomWalkRobot is a robot with the "random walk" movement strategy: it
+##    chooses a new direction at random after each time-step.
+##    """
+##    raise NotImplementedError
+##
+##
+### === Problem 6
+##
+### For the parameters tested below (cleaning 80% of a 20x20 square room),
+### RandomWalkRobots take approximately twice as long to clean the same room as
+### StandardRobots do.
+##def showPlot3():
+##    """
+##    Produces a plot comparing the two robot strategies.
+##    """
+##    raise NotImplementedError
 
-def showPlot2():
-    """
-    Produces a plot showing dependence of cleaning time on room shape.
-    """
-    raise NotImplementedError
 
-# === Problem 5
-
-class RandomWalkRobot(Robot):
-    """
-    A RandomWalkRobot is a robot with the "random walk" movement strategy: it
-    chooses a new direction at random after each time-step.
-    """
-    raise NotImplementedError
+runSimulation(1, 1, 5, 5, 1, 1, StandardRobot)
 
 
-# === Problem 6
 
-# For the parameters tested below (cleaning 80% of a 20x20 square room),
-# RandomWalkRobots take approximately twice as long to clean the same room as
-# StandardRobots do.
-def showPlot3():
-    """
-    Produces a plot comparing the two robot strategies.
-    """
-    raise NotImplementedError
