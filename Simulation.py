@@ -3,8 +3,8 @@
 import math
 import random
 
-##import ps6_visualize
-import pylab
+import ps6_visualize
+## import pylab
 
 # === Provided classes
 
@@ -209,7 +209,7 @@ class Robot(object):
         testPos=self.position.getNewPosition(self.direction, self.speed)
         if not self.room.isPositionInRoom(testPos):
             self.setRobotDirection(random.randrange(1,361,1))
-            print("out of range")
+            print(str(self.direction)+" degree bounce")
             self.updatePositionAndClean()
             
         else:
@@ -238,7 +238,7 @@ class StandardRobot(Robot):
         testPos=self.position.getNewPosition(self.direction, self.speed)
         if not self.room.isPositionInRoom(testPos):
             self.setRobotDirection(random.randrange(1,361,1))
-            print("out of range")
+            print(str(self.direction)+" degree bounce")
             self.updatePositionAndClean()
             
         else:
@@ -251,8 +251,7 @@ class StandardRobot(Robot):
 # figure out how to generate and record data - coverage - check
 # iterate over a number of simulations and figure out how to mean data - not check
 ## Fuck yeah, running at range 50-110 steps to fully clean
-## it was adding new tiles if on wall. Since on the line counts as a diff tile, had
-## to set validation test tighter
+## 
 
 def runSimulation(num_robots, speed, width, height, min_coverage, num_trials,
                   robot_type):
@@ -272,20 +271,28 @@ def runSimulation(num_robots, speed, width, height, min_coverage, num_trials,
     robot_type: class of robot to be instantiated (e.g. Robot or
                 RandomWalkRobot)
     """
-    for trials in range(1,num_trials+1):
+    resultDict={}
+    totalArray=0
+    for trials in range(num_trials):
         room=RectangularRoom(width,height)
         counter=0
-        for n in range(1,num_robots+1):
+        for n in range(num_robots):
             n=robot_type(room,speed)
         while (room.getNumCleanedTiles()/len(room.floordictionary) < min_coverage):
             for r in room.robots:
                 r.updatePositionAndClean()
             counter+=1
+        resultDict[trials]=counter
+    for x,y in resultDict.items():
+        totalArray+=y
+    print(resultDict)
+    return totalArray / len(resultDict)
+
             
-        print(counter)
-        print(len(room.floordictionary))
-        print(room.getNumCleanedTiles())
-        print(room.floordictionary)
+##        print(counter)
+##        print(len(room.floordictionary))
+##        print(room.getNumCleanedTiles())
+##        print(room.floordictionary)
         
 
 
@@ -332,7 +339,7 @@ def runSimulation(num_robots, speed, width, height, min_coverage, num_trials,
 ##    raise NotImplementedError
 
 
-runSimulation(1, 1, 5, 5, 1, 1, StandardRobot)
+print(runSimulation(5, 1, 10, 10, .9, 5, StandardRobot))
 
 
 
