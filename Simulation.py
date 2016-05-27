@@ -3,7 +3,7 @@
 import math
 import random
 
-import ps6_visualize
+import ps6_visualize as visualize
 ## import pylab
 
 # === Provided classes
@@ -70,7 +70,6 @@ class RectangularRoom(object):
         for x in range(width):
             for y in range(height):
                 self.floordictionary[x,y]=1
-        print(self.floordictionary)
     
     def cleanTileAtPosition(self, pos):
         """
@@ -120,8 +119,8 @@ class RectangularRoom(object):
 
         returns: a Position object.
         """
-        return Position(float((random.randrange(self.width)+ random.randrange(1,11)*.1)),
-                         float((random.randrange(self.height)+ random.randrange(1,11)*.1)))
+        return Position(float((random.randrange(self.width)+ random.randrange(11)*.1)),
+                         float((random.randrange(self.height)+ random.randrange(11)*.1)))
         
     def isPositionInRoom(self, pos):
         """
@@ -147,7 +146,7 @@ class Robot(object):
     Subclasses of Robot should provide movement strategies by implementing
     updatePositionAndClean(), which simulates a single time-step.
     """
-    def __init__(self, room, speed):
+    def __init__(self, name, room, speed):
         """
         Initializes a Robot with the given speed in the specified room. The
         robot initially has a random direction and a random position in the
@@ -156,6 +155,7 @@ class Robot(object):
         room:  a RectangularRoom object.
         speed: a float (speed > 0)
         """
+        self.name=name
         room.robots.append(self)
         self.room=room
         self.position=room.getRandomPosition()
@@ -209,14 +209,14 @@ class Robot(object):
         testPos=self.position.getNewPosition(self.direction, self.speed)
         if not self.room.isPositionInRoom(testPos):
             self.setRobotDirection(random.randrange(1,361,1))
-            print(str(self.direction)+" degree bounce")
+            print(self.name + " bounces " + str(self.direction)+" degrees")
             self.updatePositionAndClean()
             
         else:
             self.position=self.position.getNewPosition(self.direction, self.speed)
             self.room.cleanTileAtPosition(self.position)
         
-# === Problem 2 START HERE
+# === Problem 2 
 # Fixed issues in problem 1, now uses float->int conversion to identify panel to be cleaned in room
 # Idea = write a recursive element so it tests validitiy on each
 # Validiated to work up to problem 3. method updatepostion copied to class, remove out of range if needed
@@ -237,8 +237,8 @@ class StandardRobot(Robot):
         """
         testPos=self.position.getNewPosition(self.direction, self.speed)
         if not self.room.isPositionInRoom(testPos):
-            self.setRobotDirection(random.randrange(1,361,1))
-            print(str(self.direction)+" degree bounce")
+            self.setRobotDirection(random.randrange(361))
+            print(self.name + " bounces " + str(self.direction)+" degrees")
             self.updatePositionAndClean()
             
         else:
@@ -249,8 +249,8 @@ class StandardRobot(Robot):
 # === Problem 3
 # How to approach? First get multiple robots going all from simulation function - check
 # figure out how to generate and record data - coverage - check
-# iterate over a number of simulations and figure out how to mean data - not check
-## Fuck yeah, running at range 50-110 steps to fully clean
+# iterate over a number of simulations and figure out how to mean data - check
+## This is fully operational, like a Death Star ready to destroy the rebel fleet
 ## 
 
 def runSimulation(num_robots, speed, width, height, min_coverage, num_trials,
@@ -273,49 +273,43 @@ def runSimulation(num_robots, speed, width, height, min_coverage, num_trials,
     """
     resultDict={}
     totalArray=0
-    for trials in range(num_trials):
+    for trial in range(num_trials):
+        anim=visualize.RobotVisualization(num_robots,width,height)
         room=RectangularRoom(width,height)
         counter=0
         for n in range(num_robots):
-            n=robot_type(room,speed)
+            n=robot_type("robot-"+str(n),room,speed)
         while (room.getNumCleanedTiles()/len(room.floordictionary) < min_coverage):
             for r in room.robots:
                 r.updatePositionAndClean()
+            anim.update(room,room.robots)
             counter+=1
-        resultDict[trials]=counter
+        resultDict[trial]=counter
+        print(str(counter) + " seconds")
+        print(str(room.getNumCleanedTiles())+ " / " + str(len(room.floordictionary)))
     for x,y in resultDict.items():
         totalArray+=y
-    print(resultDict)
-    return totalArray / len(resultDict)
-
-            
-##        print(counter)
-##        print(len(room.floordictionary))
-##        print(room.getNumCleanedTiles())
-##        print(room.floordictionary)
-        
+    return totalArray / len(resultDict)  
 
 
-    
+# === Problem 4
+#
+# 1) How long does it take to clean 80% of a 20×20 room with each of 1-10 robots?
+#
+# 2) How long does it take two robots to clean 80% of rooms with dimensions 
+#	 20×20, 25×16, 40×10, 50×8, 80×5, and 100×4?
 
-### === Problem 4
-###
-### 1) How long does it take to clean 80% of a 20×20 room with each of 1-10 robots?
-###
-### 2) How long does it take two robots to clean 80% of rooms with dimensions 
-###	 20×20, 25×16, 40×10, 50×8, 80×5, and 100×4?
-##
-##def showPlot1():
-##    """
-##    Produces a plot showing dependence of cleaning time on number of robots.
-##    """ 
-##    raise NotImplementedError
-##
-##def showPlot2():
-##    """
-##    Produces a plot showing dependence of cleaning time on room shape.
-##    """
-##    raise NotImplementedError
+def showPlot1():
+    """
+    Produces a plot showing dependence of cleaning time on number of robots.
+    """ 
+    raise NotImplementedError
+
+def showPlot2():
+    """
+    Produces a plot showing dependence of cleaning time on room shape.
+    """
+    raise NotImplementedError
 ##
 ### === Problem 5
 ##
@@ -339,7 +333,7 @@ def runSimulation(num_robots, speed, width, height, min_coverage, num_trials,
 ##    raise NotImplementedError
 
 
-print(runSimulation(5, 1, 10, 10, .9, 5, StandardRobot))
+print("average steps = " + str(runSimulation(6, 0.7, 5, 5, 1, 2, StandardRobot)))
 
 
 

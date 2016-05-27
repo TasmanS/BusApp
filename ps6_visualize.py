@@ -5,7 +5,7 @@
 
 import math
 import time
-import tkinter
+import tkinter as tk
 
 
 class RobotVisualization:
@@ -20,8 +20,8 @@ class RobotVisualization:
         self.num_robots = num_robots
 
         # Initialize a drawing surface
-        self.master = Tk()
-        self.w = Canvas(self.master, width=500, height=500)
+        self.master = tk.Tk()
+        self.w = tk.Canvas(self.master, width=500, height=500)
         self.w.pack()
         self.master.update()
 
@@ -51,7 +51,7 @@ class RobotVisualization:
 
         # Draw some status text
         self.robots = None
-        self.text = self.w.create_text(25, 0, anchor=NW,
+        self.text = self.w.create_text(25, 0, anchor='nw',
                                        text=self._status_string(0, 0))
         self.time = 0
         self.master.update()
@@ -106,12 +106,9 @@ class RobotVisualization:
         self.w.delete(self.text)
         self.time += 1
         self.text = self.w.create_text(
-            25, 0, anchor=NW,
+            25, 0, anchor='nw',
             text=self._status_string(self.time, room.getNumCleanedTiles()))
         self.master.update()
         time.sleep(self.delay)
 
-    def done(self):
-        "Indicate that the animation is done so that we allow the user to close the window."
-        mainloop()
 
