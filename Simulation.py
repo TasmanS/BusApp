@@ -6,8 +6,6 @@ import random
 import ps6_visualize as visualize
 ## import pylab
 
-# === Provided classes
-
 class Position(object):
     """
     A Position represents a location in a two-dimensional room.
@@ -160,7 +158,7 @@ class Robot(object):
         self.room=room
         self.position=room.getRandomPosition()
         self.speed=speed
-        self.direction=random.randrange(1,361,1)
+        self.direction=random.randrange(360)
         room.cleanTileAtPosition(self.position)
         
     def getRobotPosition(self):
@@ -248,7 +246,7 @@ class StandardRobot(Robot):
 
 # === Problem 3
 # How to approach? First get multiple robots going all from simulation function - check
-# figure out how to generate and record data - coverage - check
+# figure out how to generate and record data + coverage - check
 # iterate over a number of simulations and figure out how to mean data - check
 ## This is fully operational, like a Death Star ready to destroy the rebel fleet
 ## 
