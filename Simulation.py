@@ -308,7 +308,8 @@ def showPlot2():
     Produces a plot showing dependence of cleaning time on room shape.
     """
     raise NotImplementedError
-##
+
+
 ### === Problem 5
 ##
 ##class RandomWalkRobot(Robot):
@@ -317,8 +318,9 @@ def showPlot2():
 ##    chooses a new direction at random after each time-step.
 ##    """
 ##    raise NotImplementedError
-##
-##
+
+
+
 ### === Problem 6
 ##
 ### For the parameters tested below (cleaning 80% of a 20x20 square room),
