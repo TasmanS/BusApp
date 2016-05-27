@@ -331,7 +331,7 @@ def showPlot2():
 ##    raise NotImplementedError
 
 
-print("average steps = " + str(runSimulation(6, 0.7, 5, 5, 1, 2, StandardRobot)))
+print("average seconds = " + str(runSimulation(6, 0.7, 5, 5, 1, 2, StandardRobot)))
 
 
 
