@@ -8,9 +8,8 @@
 <StopList>
 <Stop name="Douglass St and 24th St" StopCode="14443">
 <DepartureTimeList>
-<DepartureTime>7</DepartureTime>
-<DepartureTime>21</DepartureTime>
-<DepartureTime>33</DepartureTime>
+<DepartureTime>27</DepartureTime>
+<DepartureTime>56</DepartureTime>
 </DepartureTimeList>
 </Stop>
 
