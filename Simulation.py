@@ -4,7 +4,8 @@ import math
 import random
 
 import ps6_visualize as visualize
-## import pylab
+import pylab
+import numpy
 
 class Position(object):
     """
@@ -236,7 +237,7 @@ class StandardRobot(Robot):
         testPos=self.position.getNewPosition(self.direction, self.speed)
         if not self.room.isPositionInRoom(testPos):
             self.setRobotDirection(random.randrange(361))
-            print(self.name + " bounces " + str(self.direction)+" degrees")
+##            print(self.name + " bounces " + str(self.direction)+" degrees")
             self.updatePositionAndClean()
             
         else:
@@ -272,7 +273,7 @@ def runSimulation(num_robots, speed, width, height, min_coverage, num_trials,
     resultDict={}
     totalArray=0
     for trial in range(num_trials):
-        anim=visualize.RobotVisualization(num_robots,width,height)
+##        anim=visualize.RobotVisualization(num_robots,width,height)
         room=RectangularRoom(width,height)
         counter=0
         for n in range(num_robots):
@@ -280,11 +281,11 @@ def runSimulation(num_robots, speed, width, height, min_coverage, num_trials,
         while (room.getNumCleanedTiles()/len(room.floordictionary) < min_coverage):
             for r in room.robots:
                 r.updatePositionAndClean()
-            anim.update(room,room.robots)
+##            anim.update(room,room.robots)
             counter+=1
         resultDict[trial]=counter
-        print(str(counter) + " seconds")
-        print(str(room.getNumCleanedTiles())+ " / " + str(len(room.floordictionary)))
+##        print(str(counter) + " seconds")
+##        print(str(room.getNumCleanedTiles())+ " / " + str(len(room.floordictionary)))
     for x,y in resultDict.items():
         totalArray+=y
     return totalArray / len(resultDict)  
@@ -297,41 +298,96 @@ def runSimulation(num_robots, speed, width, height, min_coverage, num_trials,
 # 2) How long does it take two robots to clean 80% of rooms with dimensions 
 #	 20×20, 25×16, 40×10, 50×8, 80×5, and 100×4?
 
+
 def showPlot1():
     """
     Produces a plot showing dependence of cleaning time on number of robots.
-    """ 
-    raise NotImplementedError
+    """
+    ydata,robotarray=[],[]
+    for robots in range(1,11):  
+        ydata+=[runSimulation(robots, 1, 20, 20, 0.8, 20, StandardRobot)]          
+        robotarray+=[robots]    
+
+    print(ydata)
+    pylab.plot(robotarray,ydata)
+    pylab.title('Seconds to Clean Room by Robots Used')
+    pylab.xlabel('Robots')
+    pylab.ylabel('Seconds')
+    pylab.show()
+
 
 def showPlot2():
     """
     Produces a plot showing dependence of cleaning time on room shape.
     """
-    raise NotImplementedError
-##
+    
+    dimensions=[(20,20),(25,16),(40,10),(50,8),(80,5),(100,4)]
+    ydata,ratio=[],[]
+
+    for t in dimensions:  
+        ydata+=[runSimulation(2, 1, t[0], t[1], 0.8, 20, StandardRobot)]          
+        ratio+=[t[0]/t[1]]
+
+    print(ydata)
+    pylab.plot(ratio,ydata)
+    pylab.title('Seconds to Clean Room by Room Dimensions Ratio')
+    pylab.xlabel('Room Dimension Ratio(width/height)')
+    pylab.ylabel('Seconds')
+    pylab.show()
+
+
 ### === Problem 5
 ##
-##class RandomWalkRobot(Robot):
-##    """
-##    A RandomWalkRobot is a robot with the "random walk" movement strategy: it
-##    chooses a new direction at random after each time-step.
-##    """
-##    raise NotImplementedError
-##
-##
+
+    
+class RandomWalkRobot(Robot):
+    """
+    A RandomWalkRobot is a robot with the "random walk" movement strategy: it
+    chooses a new direction at random after each time-step.
+    """
+    def updatePositionAndClean(self):
+        """
+        Simulate the passage of a single time-step.
+
+        Move the robot to a new position and mark the tile it is on as having
+        been cleaned.
+        """
+        
+        testPos=self.position.getNewPosition(random.randrange(361), self.speed)
+        if not self.room.isPositionInRoom(testPos):
+            self.updatePositionAndClean()
+            
+        else:
+            self.position=testPos
+            self.room.cleanTileAtPosition(self.position)
+                   
+
 ### === Problem 6
 ##
 ### For the parameters tested below (cleaning 80% of a 20x20 square room),
 ### RandomWalkRobots take approximately twice as long to clean the same room as
 ### StandardRobots do.
-##def showPlot3():
-##    """
-##    Produces a plot comparing the two robot strategies.
-##    """
-##    raise NotImplementedError
+
+            
+def showPlot3():
+    """
+    Produces a plot comparing the two robot strategies.
+    """
+    ydata,robotarray,zdata=[],[],[]
+    for robots in range(1,11):  
+        ydata+=[runSimulation(robots, 1, 20, 20, 0.8, 20, StandardRobot)]
+        zdata+=[runSimulation(robots, 1, 20, 20, 0.8, 20, RandomWalkRobot)]
+        robotarray+=[robots]    
 
 
-print("average steps = " + str(runSimulation(6, 0.7, 5, 5, 1, 2, StandardRobot)))
+    pylab.plot(robotarray,ydata,linewidth=3.0,color="red", label="Standard")
+    pylab.plot(robotarray,zdata,linewidth=3.0,color="black", label="Random")    
+    pylab.title('Seconds to Clean Room by Robots Used')
+    pylab.xlabel('Robots')
+    pylab.ylabel('Seconds')
+    pylab.show()
 
+### 
+### Get some - problem vanquished
 
 
