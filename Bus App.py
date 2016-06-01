@@ -1,6 +1,7 @@
 import urllib.request
 import xml.etree.ElementTree as ET
 import tkinter as tk
+import datetime
 
 class busSchedule():
     def __init__(self):
@@ -24,8 +25,8 @@ class busSchedule():
         for entry in stopschedule.iter("DepartureTime"):
             schedule+=[entry.text]
             
-        if len(schedule)==0:
-            return ["--","--","--"]
+        while len(schedule)<3:
+            schedule+="--"
         
         print(schedule)
         return(schedule)
@@ -49,9 +50,15 @@ class Application():
                            justify="center", text=schedule[2])
 
 
+## set how often this updates - likely 30 seconds?
+    def updateItems(self,schedule):
+        pass
+
+
 fortyEight=busSchedule()
 app = Application()
 app.popItems(fortyEight.checkRoute())
+
 
 
 
