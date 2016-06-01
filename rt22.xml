@@ -9,8 +9,8 @@
 <Stop name="Douglass St and 24th St" StopCode="14443">
 <DepartureTimeList>
 <DepartureTime>7</DepartureTime>
-<DepartureTime>21</DepartureTime>
-<DepartureTime>33</DepartureTime>
+<DepartureTime>24</DepartureTime>
+<DepartureTime>30</DepartureTime>
 </DepartureTimeList>
 </Stop>
 
