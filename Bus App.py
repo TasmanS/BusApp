@@ -59,7 +59,7 @@ class Application():
         self.w.itemconfig(self.t2,text=latestRoute[1])
         self.w.itemconfig(self.t3,text=latestRoute[2])
         self.w.update()
-        time.sleep(30)
+        time.sleep(1)
         self.updateItems(busobject)
         
 
