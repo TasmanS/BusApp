@@ -239,8 +239,6 @@ class Patient(SimplePatient):
             #fully resistant viruses will get added
             if checkV==0:
                 viralResistPop.append(v)
-                
-        return len(viralResistPop)
 
 
     def update(self):
@@ -268,7 +266,7 @@ class Patient(SimplePatient):
         
         for v in surVirus:
             try:
-              self.viruses.append(v.reproduce(popDensity,self.drugs))
+                self.viruses.append(v.reproduce(popDensity,self.drugs))
             except NoChildException:
                 pass
 
@@ -328,46 +326,78 @@ def simulationWithDrug():
     total virus population as a function of time.    
     """
     
-    #create list of 0's to add virus pops to    
-    plotViruses=[]
-    for n in range(300):
-        plotViruses.append(0)
-    plotResist=plotViruses[:]
-
-    #create list of 100 virus instances    
+    #create 100 viruses to add to patient
     viruses=[]
     for n in range(100):
         viruses.append(ResistantVirus(.1,0.05,{"guttagonol":False},0.005))
 
-    # Do x(200) trials of simulation
-    for n in range(200):  
-         
-        #create patient class with 100 viruses and pop=1k        
+    # Declare values and holder for results
+ 
+    three00=[]
+    one50=[]
+    seventy5=[]
+    zero=[]
+
+    # run test x(30) times
+    for x in range(30):
+
+        # for the 300 step
         Troy=Patient(viruses,1000)
-
-        #updates to 300 time units
-        for n in range(150):
+        for steps in range(300):
             Troy.update()
-            plotViruses[n]=plotViruses[n]+Troy.getTotalPop()
-            plotResist[n]=plotResist[n]+Troy.getResistPop(["guttagonol"])
         Troy.addPrescription("guttagonol")
-        for n in range(150):
+        for steps in range(150):
             Troy.update()
-            plotViruses[n+150]=plotViruses[n+150]+Troy.getTotalPop()
-            plotResist[n+150]=plotResist[n+150]+Troy.getResistPop(["guttagonol"])
-        
+        three00.append(Troy.getTotalPop())
 
-    # divided by trials for average pops
-    for n in range(300):
-        plotViruses[n]=plotViruses[n]/200
-        plotResist[n]=plotResist[n]/200
-        
+        # for the 150 step
+        Troy=Patient(viruses,1000)
+        for steps in range(150):
+            Troy.update()
+        Troy.addPrescription("guttagonol")
+        for steps in range(150):
+            Troy.update()
+        one50.append(Troy.getTotalPop())
+
+        # for the 75 step
+        Troy=Patient(viruses,1000)
+        for steps in range(75):
+            Troy.update()
+        Troy.addPrescription("guttagonol")
+        for steps in range(150):
+            Troy.update()
+        seventy5.append(Troy.getTotalPop())
+
+        # for the 0 step
+        Troy=Patient(viruses,1000)
+        Troy.addPrescription("guttagonol")
+        for steps in range(150):
+            Troy.update()
+        zero.append(Troy.getTotalPop())
 
     #plot and visualize
-    pylab.hist(plotViruses,bins=4)
-    pylab.title('Virus Reproduction')
-    pylab.xlabel('Time')
-    pylab.ylabel('Virus Population')
+    pylab.hist(three00, bins=4)
+    pylab.title('Virus Simulation')
+    pylab.xlabel('Virus Pop')
+    pylab.ylabel('# of patients')
+    pylab.show()
+
+    pylab.hist(one50, bins=4)
+    pylab.title('Virus Simulation')
+    pylab.xlabel('Virus Pop')
+    pylab.ylabel('# of patients')
+    pylab.show()
+
+    pylab.hist(seventy5, bins=4)
+    pylab.title('Virus Simulation')
+    pylab.xlabel('Virus Pop')
+    pylab.ylabel('# of patients')
+    pylab.show()
+
+    pylab.hist(zero, bins=4)
+    pylab.title('Virus Simulation')
+    pylab.xlabel('Virus Pop')
+    pylab.ylabel('# of patients')
     pylab.show()
 
 
