@@ -214,37 +214,61 @@ def createBruteList(filename):
     return bruteList
 
 # combo maker
-def createCombinations(bruteList):
-    return itertools.combinations(bruteList,3)
+def createCombinations(bruteList,maxcourses):
+    masterList=[]
+    for n in range(1,maxcourses+1):
+        masterList+=itertools.combinations(bruteList,n)
+    return masterList
+
+
 
 #now check the entries - same process
 # pair down first, then score
-def evaluateCombos(iterableList,scoringDict):
-    """ given these inputs, will spit out a list(?) with score=max possible"""
+def evaluateCombos(iterableList,scoringDict,totTime):
+    """ given these inputs, will spit out a dict mapping like usual with score=max possible"""
 
     updateList=[]
-
-    #Goes through the genned Tuples, cleans out any that total too much time (current=8)
+    winnerDict={}   
+    
+    #Goes through the genned Tuples, cleans out any that total too much time 
     for entry in iterableList:
         selectTime=0
         for course in entry:
             selectTime+=scoringDict[course][1]
-        if selectTime<=8:
+        if selectTime<=totTime:
             updateList.append(entry)
 
     print(updateList)
 
-    ### this is where I left off. Need to take the winners in update list and score them to see which is best
-    #once this code is all in it should be pretty easy to point these at the big lists/dicts and COMPLETELY CRASH MY SHIT
-            
+    #Now that any Tuple will work, score the Tuples and pick the best ones
 
+    highestScore=0
+    for entry in updateList:
+        score=0
+        for course in entry:
+            score+=scoringDict[course][0]
+        if score>highestScore:
+            highestScore=score
 
+    #this works, but if it was production code I'd probably need another step where ALL the winners(in case multiple high scores)
+    #were scored 
+    for entry in updateList:
+        score=0
+        for course in entry:
+            score+=scoringDict[course][0]
+        if score==highestScore:
+            for course in entry:
+                winnerDict[course]=scoringDict.get(course)
 
+    print("the highest score was " + str(highestScore))
+    return winnerDict
+    
+    
         
-scoringDict=loadSubjects(SHORT_SUBJECT_FILENAME)
-iterableList=createCombinations(createBruteList(SHORT_SUBJECT_FILENAME))
+scoringDict=loadSubjects(SUBJECT_FILENAME)
+iterableList=createCombinations(createBruteList(SUBJECT_FILENAME),3)
 
-evaluateCombos(iterableList,scoringDict)
+print(evaluateCombos(iterableList,scoringDict,7))
 
 
 
